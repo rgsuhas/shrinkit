@@ -1,13 +1,43 @@
 "use client";
 
-import { useState } from "react";
-import { Link2, Copy, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link2, Copy, Check, LayoutDashboard, LogIn, LogOut } from "lucide-react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const supabase = createClient();
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, []);
+
+  const handleSignIn = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    router.refresh();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,54 +66,90 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 text-gray-900">
-      <div className="max-w-2xl w-full space-y-8 text-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="p-4 bg-indigo-600 rounded-2xl shadow-lg">
-            <Link2 className="w-12 h-12 text-white" />
+    <main className="min-h-screen flex flex-col items-center bg-gray-50 text-gray-900">
+      <nav className="w-full max-w-7xl px-6 py-6 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className="p-2 bg-indigo-600 rounded-lg">
+            <Link2 className="w-6 h-6 text-white" />
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl">
-            Shrink your <span className="text-indigo-600">Links</span>
-          </h1>
-          <p className="text-lg text-gray-600 max-w-md mx-auto">
-            Powerful URL shortener with real-time analytics, QR codes, and API support.
-          </p>
+          <span className="text-xl font-bold">LinkShrink</span>
         </div>
-
-        <form onSubmit={handleSubmit} className="mt-10 flex flex-col sm:flex-row gap-3">
-          <input
-            type="url"
-            required
-            placeholder="Paste your long link here..."
-            className="flex-1 px-5 py-4 rounded-xl border-gray-200 border-2 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-          <button
-            disabled={loading}
-            className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-indigo-200 disabled:opacity-50"
-          >
-            {loading ? "Shrinking..." : "Shrink Now"}
-          </button>
-        </form>
-
-        {shortUrl && (
-          <div className="mt-8 p-6 bg-white rounded-2xl border border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-left">
-                <p className="text-sm font-medium text-gray-500">Your shortened URL</p>
-                <p className="text-xl font-bold text-indigo-600 truncate max-w-xs">{shortUrl}</p>
-              </div>
-              <button
-                onClick={copyToClipboard}
-                className="flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-all"
+        <div className="flex items-center gap-4">
+          {user ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-100 rounded-xl transition-all"
               >
-                {copied ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
-                {copied ? "Copied!" : "Copy"}
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-all"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
               </button>
-            </div>
+            </>
+          ) : (
+            <button
+              onClick={handleSignIn}
+              className="flex items-center gap-2 px-6 py-2.5 bg-white border-2 border-gray-200 text-sm font-bold text-gray-700 hover:border-indigo-600 rounded-xl transition-all shadow-sm"
+            >
+              <LogIn className="w-4 h-4 text-indigo-600" />
+              Sign In
+            </button>
+          )}
+        </div>
+      </nav>
+
+      <div className="flex-1 flex flex-col items-center justify-center p-4">
+        <div className="max-w-2xl w-full space-y-8 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl">
+              Shrink your <span className="text-indigo-600">Links</span>
+            </h1>
+            <p className="text-xl text-gray-600 max-w-md mx-auto">
+              Powerful URL shortener with real-time analytics, QR codes, and API support.
+            </p>
           </div>
-        )}
+
+          <form onSubmit={handleSubmit} className="mt-10 flex flex-col sm:flex-row gap-3">
+            <input
+              type="url"
+              required
+              placeholder="Paste your long link here..."
+              className="flex-1 px-5 py-4 rounded-xl border-gray-200 border-2 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            />
+            <button
+              disabled={loading}
+              className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-indigo-200 disabled:opacity-50"
+            >
+              {loading ? "Shrinking..." : "Shrink Now"}
+            </button>
+          </form>
+
+          {shortUrl && (
+            <div className="mt-8 p-6 bg-white rounded-2xl border border-indigo-100 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 text-left">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-500 mb-1">Your shortened URL</p>
+                  <p className="text-2xl font-bold text-indigo-600 truncate">{shortUrl}</p>
+                </div>
+                <button
+                  onClick={copyToClipboard}
+                  className="flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-all"
+                >
+                  {copied ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );

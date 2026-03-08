@@ -1,35 +1,34 @@
 import {
-  mysqlTable,
+  pgTable,
   serial,
   varchar,
   timestamp,
-  int,
+  integer,
   text,
   primaryKey,
-} from "drizzle-orm/mysql-core";
-import type { AdapterAccount } from "next-auth/adapters";
+} from "drizzle-orm/pg-core";
 
-export const users = mysqlTable("user", {
+export const users = pgTable("user", {
   id: varchar("id", { length: 255 }).notNull().primaryKey(),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: timestamp("emailVerified", { mode: "date", fsp: 3 }),
+  emailVerified: timestamp("emailVerified", { mode: "date", withTimezone: true }),
   image: varchar("image", { length: 255 }),
 });
 
-export const accounts = mysqlTable(
+export const accounts = pgTable(
   "account",
   {
     userId: varchar("userId", { length: 255 })
-      .notNull(),
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     type: varchar("type", { length: 255 })
-      .$type<AdapterAccount["type"]>()
       .notNull(),
     provider: varchar("provider", { length: 255 }).notNull(),
     providerAccountId: varchar("providerAccountId", { length: 255 }).notNull(),
     refresh_token: text("refresh_token"),
     access_token: text("access_token"),
-    expires_at: int("expires_at"),
+    expires_at: integer("expires_at"),
     token_type: varchar("token_type", { length: 255 }),
     scope: varchar("scope", { length: 255 }),
     id_token: text("id_token"),
@@ -42,13 +41,15 @@ export const accounts = mysqlTable(
   })
 );
 
-export const sessions = mysqlTable("session", {
+export const sessions = pgTable("session", {
   sessionToken: varchar("sessionToken", { length: 255 }).notNull().primaryKey(),
-  userId: varchar("userId", { length: 255 }).notNull(),
+  userId: varchar("userId", { length: 255 })
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "date" }).notNull(),
 });
 
-export const verificationTokens = mysqlTable(
+export const verificationTokens = pgTable(
   "verificationToken",
   {
     identifier: varchar("identifier", { length: 255 }).notNull(),
@@ -60,11 +61,11 @@ export const verificationTokens = mysqlTable(
   })
 );
 
-export const urls = mysqlTable("url", {
+export const urls = pgTable("url", {
   id: serial("id").primaryKey(),
   originalUrl: text("original_url").notNull(),
   shortCode: varchar("short_code", { length: 10 }).notNull().unique(),
   userId: varchar("userId", { length: 255 }),
-  clickCount: int("click_count").default(0),
+  clickCount: integer("click_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });

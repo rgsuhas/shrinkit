@@ -3,8 +3,7 @@ import { db } from "@/lib/db";
 import { urls } from "@/lib/db/schema";
 import { generateShortCode } from "@/utils/generateCode";
 import { ratelimit } from "@/lib/redis";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
   const ip = req.ip ?? "127.0.0.1";
@@ -23,13 +22,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    const session = await getServerSession(authOptions);
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const shortCode = generateShortCode();
 
     await db.insert(urls).values({
       originalUrl: url,
       shortCode,
-      userId: session?.user?.id,
+      userId: user?.id,
     });
 
     return NextResponse.json({ shortCode });

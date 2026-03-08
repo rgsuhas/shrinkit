@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Link2, ExternalLink, BarChart2, Plus, Trash2 } from "lucide-react";
+import { Link2, ExternalLink, BarChart2, Plus, Trash2, Clock } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -13,7 +13,11 @@ interface UrlData {
   shortCode: string;
   clickCount: number;
   createdAt: string;
+  expiresAt: string | null;
 }
+
+const isExpired = (expiresAt: string | null) =>
+  expiresAt !== null && new Date(expiresAt) < new Date();
 
 export default function Dashboard() {
   const supabase = createClient();
@@ -46,6 +50,17 @@ export default function Dashboard() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number, shortCode: string) => {
+    try {
+      const res = await fetch(`/api/user-urls/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setUrls((prev) => prev.filter((u) => u.id !== id));
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -120,61 +135,87 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6">
-            {urls.map((url) => (
-              <div
-                key={url.id}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow flex flex-col lg:flex-row gap-6"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md uppercase tracking-wider">
-                      Active
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(url.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <h2 className="text-xl font-bold truncate mb-1">
-                    <a
-                      href={getFullShortUrl(url.shortCode)}
-                      target="_blank"
-                      className="hover:text-indigo-600 transition-colors"
-                    >
-                      {getFullShortUrl(url.shortCode)}
-                    </a>
-                  </h2>
-                  <p className="text-sm text-gray-500 truncate mb-4">{url.originalUrl}</p>
-
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-semibold text-gray-700">
-                      <BarChart2 className="w-4 h-4 text-gray-400" />
-                      {url.clickCount} clicks
+            {urls.map((url) => {
+              const expired = isExpired(url.expiresAt);
+              return (
+                <div
+                  key={url.id}
+                  className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow flex flex-col lg:flex-row gap-6"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span
+                        className={`text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider ${
+                          expired
+                            ? "text-red-600 bg-red-50"
+                            : "text-indigo-600 bg-indigo-50"
+                        }`}
+                      >
+                        {expired ? "Expired" : "Active"}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {new Date(url.createdAt).toLocaleDateString()}
+                      </span>
+                      {url.expiresAt && (
+                        <span className="flex items-center gap-1 text-xs text-gray-400">
+                          <Clock className="w-3 h-3" />
+                          {expired ? "Expired" : "Expires"}{" "}
+                          {new Date(url.expiresAt).toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
-                    <a
-                      href={getFullShortUrl(url.shortCode)}
-                      target="_blank"
-                      className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-lg text-sm font-semibold text-gray-700 transition-colors"
-                    >
-                      <ExternalLink className="w-4 h-4 text-gray-400" />
-                      Visit
-                    </a>
-                  </div>
-                </div>
+                    <h2 className="text-xl font-bold truncate mb-1">
+                      <a
+                        href={getFullShortUrl(url.shortCode)}
+                        target="_blank"
+                        className="hover:text-indigo-600 transition-colors"
+                      >
+                        {getFullShortUrl(url.shortCode)}
+                      </a>
+                    </h2>
+                    <p className="text-sm text-gray-500 truncate mb-4">{url.originalUrl}</p>
 
-                <div className="flex items-center gap-6 self-center lg:self-auto border-t lg:border-t-0 lg:border-l border-gray-100 pt-6 lg:pt-0 lg:pl-6">
-                  <div className="p-2 bg-gray-50 rounded-lg border border-gray-100">
-                    <QRCodeSVG
-                      value={getFullShortUrl(url.shortCode)}
-                      size={64}
-                      fgColor="#4f46e5"
-                    />
+                    <div className="flex flex-wrap gap-4">
+                      <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-semibold text-gray-700">
+                        <BarChart2 className="w-4 h-4 text-gray-400" />
+                        {url.clickCount} clicks
+                      </div>
+                      <a
+                        href={getFullShortUrl(url.shortCode)}
+                        target="_blank"
+                        className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-lg text-sm font-semibold text-gray-700 transition-colors"
+                      >
+                        <ExternalLink className="w-4 h-4 text-gray-400" />
+                        Visit
+                      </a>
+                      <button
+                        onClick={() => router.push(`/stats/${url.shortCode}`)}
+                        className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-lg text-sm font-semibold text-gray-700 transition-colors"
+                      >
+                        <BarChart2 className="w-4 h-4 text-indigo-400" />
+                        Stats
+                      </button>
+                    </div>
                   </div>
-                  <button className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+
+                  <div className="flex items-center gap-6 self-center lg:self-auto border-t lg:border-t-0 lg:border-l border-gray-100 pt-6 lg:pt-0 lg:pl-6">
+                    <div className="p-2 bg-gray-50 rounded-lg border border-gray-100">
+                      <QRCodeSVG
+                        value={getFullShortUrl(url.shortCode)}
+                        size={64}
+                        fgColor="#4f46e5"
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleDelete(url.id, url.shortCode)}
+                      className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>

@@ -12,9 +12,12 @@ export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [url, setUrl] = useState("");
+  const [customAlias, setCustomAlias] = useState("");
+  const [expirationDays, setExpirationDays] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const getUser = async () => {
@@ -22,6 +25,12 @@ export default function Home() {
       setUser(user);
     };
     getUser();
+
+    // Show expired error from URL param
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "expired") {
+      setError("That link has expired.");
+    }
   }, []);
 
   const handleSignIn = async () => {
@@ -42,18 +51,25 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
+      const body: Record<string, unknown> = { url };
+      if (user && customAlias.trim()) body.customAlias = customAlias.trim();
+      if (user && expirationDays) body.expirationDays = parseInt(expirationDays, 10);
+
       const res = await fetch("/api/shorten", {
         method: "POST",
-        body: JSON.stringify({ url }),
+        body: JSON.stringify(body),
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
-      if (data.shortCode) {
+      if (!res.ok) {
+        setError(data.error ?? "Something went wrong");
+      } else if (data.shortCode) {
         setShortUrl(`${window.location.origin}/${data.shortCode}`);
       }
     } catch (err) {
-      console.error(err);
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -115,21 +131,51 @@ export default function Home() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-10 flex flex-col sm:flex-row gap-3">
-            <input
-              type="url"
-              required
-              placeholder="Paste your long link here..."
-              className="flex-1 px-5 py-4 rounded-xl border-gray-200 border-2 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
-            <button
-              disabled={loading}
-              className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-indigo-200 disabled:opacity-50"
-            >
-              {loading ? "Shrinking..." : "Shrink Now"}
-            </button>
+          <form onSubmit={handleSubmit} className="mt-10 flex flex-col gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="url"
+                required
+                placeholder="Paste your long link here..."
+                className="flex-1 px-5 py-4 rounded-xl border-gray-200 border-2 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+              <button
+                disabled={loading}
+                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-indigo-200 disabled:opacity-50"
+              >
+                {loading ? "Shrinking..." : "Shrink Now"}
+              </button>
+            </div>
+
+            {user && (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="text"
+                  placeholder="Custom alias (optional, 3-20 chars)"
+                  className="flex-1 px-5 py-3 rounded-xl border-gray-200 border-2 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm"
+                  value={customAlias}
+                  onChange={(e) => setCustomAlias(e.target.value)}
+                  minLength={3}
+                  maxLength={20}
+                  pattern="[a-zA-Z0-9_-]+"
+                />
+                <input
+                  type="number"
+                  placeholder="Expires in days (optional)"
+                  className="sm:w-56 px-5 py-3 rounded-xl border-gray-200 border-2 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm"
+                  value={expirationDays}
+                  onChange={(e) => setExpirationDays(e.target.value)}
+                  min={1}
+                  max={365}
+                />
+              </div>
+            )}
+
+            {error && (
+              <p className="text-red-600 text-sm font-medium text-left">{error}</p>
+            )}
           </form>
 
           {shortUrl && (

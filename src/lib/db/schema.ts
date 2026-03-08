@@ -64,8 +64,20 @@ export const verificationTokens = pgTable(
 export const urls = pgTable("url", {
   id: serial("id").primaryKey(),
   originalUrl: text("original_url").notNull(),
-  shortCode: varchar("short_code", { length: 10 }).notNull().unique(),
+  shortCode: varchar("short_code", { length: 20 }).notNull().unique(),
   userId: varchar("userId", { length: 255 }),
   clickCount: integer("click_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at"),
+});
+
+export const urlAnalytics = pgTable("url_analytics", {
+  id: serial("id").primaryKey(),
+  shortCode: varchar("short_code", { length: 20 })
+    .notNull()
+    .references(() => urls.shortCode, { onDelete: "cascade" }),
+  accessTime: timestamp("access_time").defaultNow().notNull(),
+  userAgent: text("user_agent"),
+  ipAddress: varchar("ip_address", { length: 45 }),
+  referrer: text("referrer"),
 });

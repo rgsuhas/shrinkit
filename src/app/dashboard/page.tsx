@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Link2, ExternalLink, BarChart2, Plus, Trash2, Clock } from "lucide-react";
+import { Link2, ExternalLink, BarChart2, Plus, Trash2, Clock, LogOut } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -94,8 +94,19 @@ export default function Dashboard() {
               <button
                 onClick={() => router.push("/")}
                 className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"
+                title="Create new"
               >
                 <Plus className="w-5 h-5" />
+              </button>
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  router.push("/");
+                }}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-red-600 hover:bg-red-50 rounded-xl transition-all"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Sign Out</span>
               </button>
             </div>
           </div>

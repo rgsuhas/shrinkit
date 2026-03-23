@@ -15,6 +15,11 @@ export async function GET(
 ) {
   const { slug } = params;
 
+  // Ignore static file requests that fall through to this route
+  if (slug === "favicon.ico" || slug.includes(".")) {
+    return NextResponse.next();
+  }
+
   // Check Redis cache first
   let originalUrl: string;
   let expiresAt: string | null;

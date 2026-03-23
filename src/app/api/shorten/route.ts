@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ shortCode });
   } catch (error) {
+    console.error("[/api/shorten]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

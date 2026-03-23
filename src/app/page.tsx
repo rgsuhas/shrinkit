@@ -197,6 +197,11 @@ export default function Home() {
           )}
         </div>
       </div>
+
+      <footer className="w-full py-6 text-center text-sm text-gray-400 flex justify-center gap-6">
+        <Link href="/privacy-policy" className="hover:text-gray-600 transition-colors">Privacy Policy</Link>
+        <Link href="/terms-of-service" className="hover:text-gray-600 transition-colors">Terms of Service</Link>
+      </footer>
     </main>
   );
 }

@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LinkShrink - Highly Scalable URL Shortener",
+  title: "Shrinkit - Highly Scalable URL Shortener",
   description: "Generate shortened URLs in milliseconds with advanced analytics.",
 };
 

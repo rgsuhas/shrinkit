@@ -1,4 +1,4 @@
-# LinkShrink — Architecture & Build Story
+# Shrinkit — Architecture & Build Story
 
 > A production-grade URL shortener built with Next.js 14, Supabase, Drizzle ORM, and Upstash Redis. This document covers every architectural decision, the trade-offs behind them, and why things are built the way they are.
 
@@ -31,7 +31,7 @@ URL shorteners look simple on the surface: take a long URL, spit out a short one
 - How do you track analytics without slowing down the redirect itself?
 - How do you handle link expiration without a cron job?
 
-LinkShrink answers all of these. Here's how.
+Shrinkit answers all of these. Here's how.
 
 ---
 

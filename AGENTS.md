@@ -1,4 +1,4 @@
-# Agent Mandates: LinkShrink Project
+# Agent Mandates: Shrinkit Project
 
 This project is a high-performance URL shortener built with Next.js, Supabase, and Drizzle ORM. All agents working on this codebase must adhere to the following standards and architecture.
 

@@ -85,7 +85,7 @@ export default function Dashboard() {
               <div className="p-2 bg-indigo-600 rounded-lg">
                 <Link2 className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold">LinkShrink</span>
+              <span className="text-xl font-bold">Shrinkit</span>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600 hidden sm:block">

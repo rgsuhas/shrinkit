@@ -1,4 +1,4 @@
-# shawty — LinkShrink
+# Shrinkit
 
 A high-performance URL shortener built with Next.js 14, Supabase, Drizzle ORM, and Upstash Redis.
 
@@ -85,8 +85,12 @@ src/
       user-urls/route.ts         # GET  — list authenticated user's URLs
       user-urls/[id]/route.ts    # DELETE — delete a URL + invalidate cache
       stats/[shortCode]/route.ts # GET  — per-link stats (owner only)
+    auth/callback/route.ts       # OAuth callback handler
+    auth/auth-code-error/page.tsx# Auth error page
     dashboard/page.tsx           # User dashboard
     stats/[shortCode]/page.tsx   # Per-link stats page
+    privacy-policy/page.tsx      # Privacy policy
+    terms-of-service/page.tsx    # Terms of service
     page.tsx                     # Homepage / shorten form
   lib/
     db/schema.ts                 # Drizzle schema (urls, urlAnalytics, auth tables)

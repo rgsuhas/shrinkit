@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — LinkShrink",
+  title: "Privacy Policy — Shrinkit",
 };
 
 export default function PrivacyPolicy() {
@@ -14,7 +14,7 @@ export default function PrivacyPolicy() {
           <div className="p-2 bg-indigo-600 rounded-lg">
             <Link2 className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold">LinkShrink</span>
+          <span className="text-xl font-bold">Shrinkit</span>
         </Link>
       </nav>
 
@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-2">1. Information We Collect</h2>
             <p>
-              When you use LinkShrink, we collect the following information:
+              When you use Shrinkit, we collect the following information:
             </p>
             <ul className="list-disc list-inside mt-2 space-y-1">
               <li>Your email address and profile information when you sign in with Google.</li>
@@ -39,7 +39,7 @@ export default function PrivacyPolicy() {
             <h2 className="text-xl font-bold text-gray-900 mb-2">2. How We Use Your Information</h2>
             <p>We use collected information to:</p>
             <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>Provide and operate the LinkShrink service.</li>
+              <li>Provide and operate the Shrinkit service.</li>
               <li>Associate shortened URLs with your account.</li>
               <li>Display click analytics on your dashboard.</li>
               <li>Enforce rate limits and prevent abuse.</li>
@@ -58,7 +58,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-2">4. Cookies & Sessions</h2>
             <p>
-              LinkShrink uses cookies solely to manage your authentication session via Supabase Auth.
+              Shrinkit uses cookies solely to manage your authentication session via Supabase Auth.
               No tracking or advertising cookies are used.
             </p>
           </section>

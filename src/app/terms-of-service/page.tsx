@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — LinkShrink",
+  title: "Terms of Service — Shrinkit",
 };
 
 export default function TermsOfService() {
@@ -14,7 +14,7 @@ export default function TermsOfService() {
           <div className="p-2 bg-indigo-600 rounded-lg">
             <Link2 className="w-6 h-6 text-white" />
           </div>
-          <span className="text-xl font-bold">LinkShrink</span>
+          <span className="text-xl font-bold">Shrinkit</span>
         </Link>
       </nav>
 
@@ -26,14 +26,14 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-2">1. Acceptance of Terms</h2>
             <p>
-              By accessing or using LinkShrink, you agree to be bound by these Terms of Service.
+              By accessing or using Shrinkit, you agree to be bound by these Terms of Service.
               If you do not agree, please do not use the service.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-2">2. Use of the Service</h2>
-            <p>You agree not to use LinkShrink to:</p>
+            <p>You agree not to use Shrinkit to:</p>
             <ul className="list-disc list-inside mt-2 space-y-1">
               <li>Shorten URLs that link to illegal, harmful, or malicious content.</li>
               <li>Distribute spam, phishing links, or malware.</li>
@@ -61,7 +61,7 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-2">5. Intellectual Property</h2>
             <p>
-              The LinkShrink name, logo, and service are our property. You retain ownership of
+              The Shrinkit name, logo, and service are our property. You retain ownership of
               the URLs and content you submit.
             </p>
           </section>
@@ -69,7 +69,7 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-2">6. Disclaimer of Warranties</h2>
             <p>
-              LinkShrink is provided "as is" without warranties of any kind. We do not guarantee
+              Shrinkit is provided "as is" without warranties of any kind. We do not guarantee
               uptime, accuracy, or fitness for a particular purpose. Use the service at your own risk.
             </p>
           </section>
@@ -77,7 +77,7 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-2">7. Limitation of Liability</h2>
             <p>
-              To the fullest extent permitted by law, LinkShrink shall not be liable for any
+              To the fullest extent permitted by law, Shrinkit shall not be liable for any
               indirect, incidental, or consequential damages arising from your use of the service.
             </p>
           </section>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Authentication Error — LinkShrink",
+  title: "Authentication Error — Shrinkit",
 };
 
 export default function AuthCodeError() {
@@ -24,7 +24,7 @@ export default function AuthCodeError() {
           href="/"
           className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md"
         >
-          Back to LinkShrink
+          Back to Shrinkit
         </Link>
       </div>
     </div>

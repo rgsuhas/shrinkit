@@ -94,7 +94,7 @@ export default function StatsPage() {
               <div className="p-2 bg-indigo-600 rounded-lg">
                 <Link2 className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold">LinkShrink</span>
+              <span className="text-xl font-bold">Shrinkit</span>
             </div>
             <button
               onClick={() => router.push("/dashboard")}
